@@ -1,56 +1,57 @@
-import './App.css';
+import React, { useEffect, createRef } from 'react';
 import { Axes, ClippingComponent, Grid, Viewer } from 'web-ifc-viewer';
-import { IconButton } from '@material-ui/core';
-import React from 'react';
 import Dropzone from 'react-dropzone';
+import './App.css';
 
 //Icons
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import CropIcon from '@material-ui/icons/Crop';
+import { IconButton} from '@material-ui/core';
 
-class App extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.dropzoneRef = React.createRef();
-    }
+const App =  () => {
+    
+    let axes;
+    let grid;
+    let clipping;
+    let viewer;
 
-    componentDidMount() {
+    const dropzoneRef = createRef();
+
+    useEffect(()=>{
         const container = document.getElementById("viewer-container");
-        const viewer = new Viewer(container);
+        viewer = new Viewer(container);
         viewer.ifcLoader.setWasmPath("../../");
 
-        this.grid = new Grid(viewer, 100,100);
-        this.axes = new Axes(viewer);
-        this.clipping = new ClippingComponent(viewer);
+        grid = new Grid(viewer, 100,100);
+        axes = new Axes(viewer);
+        clipping = new ClippingComponent(viewer);
 
-        this.viewer = viewer;
-    }
+    },[])
 
-    onDrop = (files) => {
-        this.viewer.loadIfc(files[0]);
+    const onDrop = (files) => {
+        viewer.loadIfc(files[0]);
     };
 
-    handleToggleClipping = () => {
-        this.clipping.active = !this.clipping.active;
+    const handleToggleClipping = () => {
+        clipping.active = !clipping.active;
     }
 
-    handleClickOpen = () => {
-        this.dropzoneRef.current.open()
+    const handleClickOpen = () => {
+        dropzoneRef.current.open()
     }
 
-    render() {
         return (
           <div style={{ display: "flex", flexDirection: "row", height: "100vh"}}>
               <aside style={{ width: 50 }}>
-                  <IconButton onClick={this.handleClickOpen}>
+                  <IconButton onClick={handleClickOpen}>
                       <FolderOpenIcon />
                   </IconButton>
-                  <IconButton onClick={this.handleToggleClipping}>
+                  <IconButton onClick={handleToggleClipping}>
                       <CropIcon />
                   </IconButton>
               </aside>
-              <Dropzone ref={this.dropzoneRef} onDrop={this.onDrop}>
+              <Dropzone ref={dropzoneRef} onDrop={onDrop}>
                   {({getRootProps, getInputProps}) => (
                     <div {...getRootProps({className: 'dropzone'})}>
                         <input {...getInputProps()} />
@@ -63,6 +64,6 @@ class App extends React.Component {
           </div>
         );
     }
-}
+
 
 export default App;
